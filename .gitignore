@@ -1,10 +1,13 @@
 .settings
 classes/
-/build
-target/
+/build/*
+!/build/.gitkeep
+target/*
+!target/.gitkeep
 .project
 .classpath
-binaries/
+binaries/*
+!binaries/.gitkeep
 WebContent/WEB-INF/conf/binarystore.properties
 WebContent/WEB-INF/conf/database.properties
 WebContent/WEB-INF/conf/ldap.properties
