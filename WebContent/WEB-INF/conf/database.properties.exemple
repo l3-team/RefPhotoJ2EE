@@ -1,0 +1,5 @@
+drivers = com.mysql.jdbc.Driver
+refphoto.url = jdbc:mysql://server:3306/databasename?useSSL=false
+refphoto.user = refphoto
+refphoto.password = password
+refphoto.maxconn = 20

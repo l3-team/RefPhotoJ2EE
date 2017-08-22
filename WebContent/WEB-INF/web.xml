@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+  
+  <display-name>refphoto</display-name>
+  
+  <!--
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+  -->
+  
+  <servlet>
+      <servlet-name>springmvc</servlet-name>
+      <servlet-class>
+          org.springframework.web.servlet.DispatcherServlet
+      </servlet-class>
+      <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+      <servlet-name>springmvc</servlet-name>
+      <!-- 
+      <url-pattern>/welcome.jsp</url-pattern>
+      <url-pattern>/welcome.html</url-pattern>
+      <url-pattern>*.html</url-pattern>
+      -->
+      <url-pattern>/*</url-pattern>
+  </servlet-mapping>
+  
+  <context-param>
+    <param-name>log4j-properties-location</param-name>
+    <param-value>WEB-INF/conf/log4j.properties</param-value>
+  </context-param>
+   
+  <context-param>
+    <param-name>database-properties-location</param-name>
+    <param-value>WEB-INF/conf/database.properties</param-value>
+  </context-param>
+  
+  <context-param>
+    <param-name>ldap-properties-location</param-name>
+    <param-value>WEB-INF/conf/ldap.properties</param-value>
+  </context-param>
+  
+  <context-param>
+    <param-name>binarystore-properties-location</param-name>
+    <param-value>WEB-INF/conf/binarystore.properties</param-value>
+  </context-param>
+  
+  <context-param>
+    <param-name>memcache-properties-location</param-name>
+    <param-value>WEB-INF/conf/memcache.properties</param-value>
+  </context-param>
+  
+  <context-param>
+    <param-name>security-properties-location</param-name>
+    <param-value>WEB-INF/conf/security.properties</param-value>
+  </context-param>
+  
+  <listener>
+    <listener-class>lille3.refphoto.logger.Log4jContextListener</listener-class>
+  </listener>
+  
+  <listener>
+    <listener-class>lille3.refphoto.db.DatabaseContextListener</listener-class>
+  </listener>
+  
+  <listener>
+    <listener-class>lille3.refphoto.ldap.LdapContextListener</listener-class>
+  </listener>
+  
+  <listener>
+    <listener-class>lille3.refphoto.binarystore.BinaryStoreContextListener</listener-class>
+  </listener>
+  
+  <listener>
+    <listener-class>lille3.refphoto.memcache.MemCacheContextListener</listener-class>
+  </listener>
+  
+  <listener>
+    <listener-class>lille3.refphoto.security.SecurityContextListener</listener-class>
+  </listener>
+  
+</web-app>

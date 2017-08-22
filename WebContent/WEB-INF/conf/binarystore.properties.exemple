@@ -1,0 +1,6 @@
+photo.path = /home/mhetru/workspace/refphoto/binaries
+photo.read = /home/mhetru/workspace/refphoto/datas
+photo.default = /home/mhetru/workspace/refphoto/default.jpg
+photo.blocked = /home/mhetru/workspace/refphoto/blocked.jpg
+photo.resize = 161x178
+photo.extension = .jpg

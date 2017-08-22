@@ -1,0 +1,13 @@
+.settings
+classes/
+/build
+target/
+.project
+.classpath
+binaries/
+WebContent/WEB-INF/conf/binarystore.properties
+WebContent/WEB-INF/conf/database.properties
+WebContent/WEB-INF/conf/ldap.properties
+WebContent/WEB-INF/conf/log4j.properties
+WebContent/WEB-INF/conf/memcache.properties
+WebContent/WEB-INF/conf/security.properties

@@ -1,0 +1,4 @@
+security.active_reverse_proxy = false
+security.reverse_proxy =
+security.valid_server = 127.0.0.1,localhost
+security.xvalid_server = 

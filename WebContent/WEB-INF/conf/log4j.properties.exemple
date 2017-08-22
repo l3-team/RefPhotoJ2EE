@@ -1,0 +1,15 @@
+#DEBUG < INFO < WARN < ERROR < FATAL
+log4j.rootLogger = INFO, stdout, fileappender
+
+#Configuration sortie stdout
+log4j.appender.stdout = org.apache.log4j.ConsoleAppender
+log4j.appender.stdout.layout = org.apache.log4j.PatternLayout
+log4j.appender.stdout.layout.ConversionPattern = %5p [%t] (%F:%L) - %m%n
+
+#Configuration sortie fichier
+log4j.appender.fileappender = org.apache.log4j.RollingFileAppender
+log4j.appender.fileappender.File = /var/log/tomcat7/refphoto.log
+log4j.appender.fileappender.MaxFileSize = 500KB
+log4j.appender.fileappender.MaxBackupIndex = 3
+log4j.appender.fileappender.layout = org.apache.log4j.PatternLayout
+log4j.appender.fileappender.layout.ConversionPattern = %d{dd MMM yyyy HH:mm:ss} - <%p> (%c -> %F:%L) - %m%n

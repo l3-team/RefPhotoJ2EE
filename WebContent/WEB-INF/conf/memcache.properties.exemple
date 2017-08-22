@@ -1,0 +1,2 @@
+memcache.host = localhost
+memcache.port = 11211
