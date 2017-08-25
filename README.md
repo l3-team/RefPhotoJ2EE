@@ -94,7 +94,6 @@ export CLASSPATH=.:`pwd`/../lib/log4j-1.2.17.jar:`pwd`/../lib/spymemcached-2.12.
 
 java lille3.refphoto.cli.Importuser <uid>
 (where uid is the uid of the person, example : java lille3.refphoto.cli.Importuser 1940)
-```
 - for loops on all LDAP user :
 ```
 cd target/refphoto-0.0.1-SNAPSHOT/WEB-INF/classes
