@@ -3,7 +3,6 @@ package lille3.refphoto.memcache;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 

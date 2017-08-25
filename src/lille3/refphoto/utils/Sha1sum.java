@@ -49,6 +49,7 @@ public class Sha1sum {
 					;
 				}
 				byte[] b = md.digest();
+				dis.close();
 				localSha1Sum = getHexString(b);
 			} catch (Exception e) {
 				if (logger.isInfoEnabled())

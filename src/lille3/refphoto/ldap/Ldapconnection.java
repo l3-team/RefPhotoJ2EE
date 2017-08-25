@@ -166,6 +166,95 @@ public class Ldapconnection {
     	return resultats;
     }
     
+    //@SuppressWarnings("unchecked")
+	public Hashtable<String, String[]>[] searchMultiple(String filter, String[] attributes, String overloadDn)
+    {    	
+    	Hashtable<String, String[]> resultats = null;
+    	Hashtable<String, String[]> tab_resultats[] = null;
+    	
+    	int compteur_resultats=0;    	
+    	String searchBaseDn = "";
+    	
+    	if (!overloadDn.equals(""))
+    	{
+    		searchBaseDn = overloadDn + "," + this.basedn;
+    	} else
+    	{
+    		searchBaseDn = this.branch + "," + this.basedn;    	
+    	}
+
+    	//System.out.println("searchBaseDn=["+searchBaseDn+"]");
+    	//System.out.println("filter=["+filter+"]");
+    	
+    	try {
+    		SearchControls searchControls = new SearchControls();
+    		//searchControls.setSearchScope(SearchControls.SUBTREE_SCOPE);
+    		searchControls.setSearchScope(SearchControls.ONELEVEL_SCOPE);
+    		searchControls.setReturningAttributes(attributes);
+    		
+    		//@SuppressWarnings("rawtypes")
+			NamingEnumeration resultat = context.search(searchBaseDn, filter, searchControls);
+    		
+    		
+    		while(resultat.hasMore()) {
+    			SearchResult sr2 = (SearchResult)resultat.next();
+    			compteur_resultats++;
+    		}
+    		
+    		//System.out.println("compteur_resultats="+compteur_resultats);
+    		
+    		tab_resultats = new Hashtable[compteur_resultats];
+			//resultats = new Hashtable<String, String[]>();
+			compteur_resultats=-1;
+			
+    		resultat = context.search(searchBaseDn, filter, searchControls);
+    		
+    		while (resultat.hasMore()) {
+    			resultats = new Hashtable<String, String[]>();
+    			compteur_resultats++;
+    			SearchResult sr = (SearchResult)resultat.next();
+				Attributes attrs = sr.getAttributes();
+				String at = "";
+				//@SuppressWarnings("unused")
+				String tmp = "";
+				String[] tab_at = {};
+				int idx = 0;
+				int cpt = 0;
+				//@SuppressWarnings("rawtypes")
+				NamingEnumeration ae = attrs.getAll();
+				while(ae.hasMore()) {
+					cpt = 0;
+					idx = 0;
+					Attribute attr = (Attribute) ae.next();
+					at = attr.getID();
+					//System.out.println("attribut:"+at);
+					
+					//@SuppressWarnings("rawtypes")
+					NamingEnumeration e = attr.getAll();
+					while(e.hasMore()) {
+						tmp = (String) e.next();
+						cpt++;
+					}
+					e = attr.getAll();
+					tab_at = new String[cpt];
+					while(e.hasMore()) {			        	  
+						tab_at[idx] = (String) e.next();
+						//System.out.println(">"+tab_at[idx]);
+						idx++;
+					}
+					resultats.put(at, tab_at);
+				}
+				tab_resultats[compteur_resultats] = resultats;
+    		}
+    		
+    	} catch (NamingException e) {
+    		if(logger.isInfoEnabled())
+    			logger.info("erreur:"+e.getMessage());
+    	}
+    	
+    	return tab_resultats;
+    }
+    
     public void Closeconnection()
     {
     	if (context != null)

@@ -11,8 +11,6 @@ import javax.servlet.annotation.WebListener;
 
 import org.apache.log4j.Logger;
 
-import lille3.refphoto.db.Dbconnectionmanager;
-
 /**
  * Classe permettant l'initialisation de log4j.
  * @author Fontaine Frederic.

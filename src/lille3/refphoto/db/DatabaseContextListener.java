@@ -32,8 +32,10 @@ public final class DatabaseContextListener implements ServletContextListener {
     	try {
     		Properties props = new Properties();
     		props.load(new FileInputStream(prefix + dbConfigLocation));
-    		Dbconnectionmanager connMgr = Dbconnectionmanager.getInstance(props);    		
+    		Dbconnectionmanager connMgr = Dbconnectionmanager.getInstance(props);
+    		Dbconnection db = new Dbconnection(props);
             context.setAttribute("dbRefphoto", connMgr);
+            context.setAttribute("dbRefphoto2", db);
             if(logger.isInfoEnabled())
             	logger.info("L'initialisation du pool de connections de l'application avec " + prefix + dbConfigLocation + " s'est correctement déroulé.");
 		}catch (final IOException e) {

@@ -39,13 +39,22 @@ public class Dbconnection {
         try {
         	Driver driver = (Driver) Class.forName(this.drivers).newInstance();
             DriverManager.registerDriver(driver);
-            con=DriverManager.getConnection(this.url, this.user, this.password);            
+            con = DriverManager.getConnection(this.url, this.user, this.password);            
         } catch(Exception e) {
             if (logger.isInfoEnabled())
             	logger.info("erreur: " + e.getMessage());       
         }
     }
 
+    public boolean isConnected() {
+    	boolean ret = false;
+    	if (this.con == null) {
+    		ret = false;
+    	} else {
+    		ret = true;
+    	}
+    	return ret;
+    }
 
     public ResultSet query(String query) {
         
@@ -55,20 +64,19 @@ public class Dbconnection {
 	    	return null;
 	    }
 	
-	    type_requete=type_requete.trim();
-	    type_requete=query.substring(0,5);
-		type_requete=type_requete.toUpperCase();
-		
+	    type_requete = query.substring(0,6);
+	    type_requete = type_requete.trim();
+		type_requete = type_requete.toUpperCase();	
 		try {
 		        
 			stmt = con.createStatement();
 			if (type_requete.equals("UPDATE") || (type_requete.equals("INSERT"))) {
 				stmt.executeUpdate(query);
-				rs=null;
+				rs = null;
 			} else {		        
 			    rs = stmt.executeQuery(query);			    
-			    md = rs.getMetaData();			    
-			    stmt.close();
+			    //md = rs.getMetaData();			    
+			    //stmt.close();
 		    }
 		} catch (SQLException e) {
 			if (logger.isInfoEnabled())
@@ -112,8 +120,12 @@ public class Dbconnection {
 
 	public void disconnect() {
 		try {
-			rs.close();
-		    con.close();            
+			if (stmt != null) stmt.close();
+			stmt = null;
+			if (rs != null) rs.close();
+			rs = null;
+		    if (con != null) con.close();
+		    con = null;
 		} catch(SQLException e) {
 			if (logger.isInfoEnabled())
 				logger.info("erreur: " + e.getMessage());       

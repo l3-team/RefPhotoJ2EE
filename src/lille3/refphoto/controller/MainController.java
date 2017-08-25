@@ -9,10 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
 
 //import org.apache.catalina.connector.Response;
 import org.apache.log4j.Logger;
@@ -52,6 +50,20 @@ public class MainController {
     @Autowired
     private ServletContext context;    		
 	
+    /*@RequestMapping(value = "/test")
+    @ResponseBody
+    public String test() {
+    	if (logger.isInfoEnabled())
+			logger.info("call action test() from route /test");
+    	
+    	Photoserviceweb service = new Photoserviceweb(context);
+    	//service.requete();
+    	
+    	service.importAllPhoto();    	    	
+    	
+    	return "";
+    }*/
+    
 	@RequestMapping(value = "/token/add/{uid}")
 	@ResponseBody
 	public String createTokenAction(@PathVariable("uid") String uid) {

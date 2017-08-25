@@ -63,16 +63,33 @@ public class Binarystore {
 		return image;
 	}*/
 	
-	public File getPhotoFromFile(String id) {
+	public File getPhotoFromFile(String uid, String id, String type) {
+		int return_val = 0;
 		//BufferedImage image = null;
 		File image = null;
 		//try {
 			//image = ImageIO.read(new File(this.photoread + "/" + id + this.photoextension));
-			image = new File(this.photoread + "/" + id + this.photoextension);
+		image = new File(this.photoread + "/" + id + this.photoextension);
+		
+		if (image.exists()) {
+			return_val = 0;
+		} else {
+			image = new File(this.photodefault);
+			//image = null;
+			return_val = 1;
+		}
+		
 		//} catch(IOException e) {				
 		//	if (logger.isInfoEnabled())
 		//		logger.info("erreur:"+e.getMessage());
 		//}
+		
+		if (return_val == 0) {
+			return image;
+		} else {
+			System.out.println("Erreur : Fichier " + this.photoread + "/" + id + this.photoextension + " introuvable pour l'uid " + uid + " (de type " + type + "). Utilisation du fichier " + this.photodefault);
+		}
+		
 		return image;
 	}
 	
@@ -134,7 +151,7 @@ public class Binarystore {
 		Sha1 imageSha1 = null;
 		//imageOriginSha1.setSha1(Sha1sum.sha1sum(new File(fname)));
 		imageOriginSha1.setSha1(Sha1sum.sha1sum(image));
-		System.out.println("sha1sum=["+Sha1sum.sha1sum(image)+"]");
+		//System.out.println("sha1sum=["+Sha1sum.sha1sum(image)+"]");
 		
 		//File ff = new File(fname);
 		//ff.delete();
@@ -178,7 +195,7 @@ public class Binarystore {
         	String fname_resized = "";
     		try {
     			fname_resized = "/tmp/" + UUID.randomUUID().toString() + ".jpg";
-    			System.out.println("fname_resized=["+fname_resized+"]");
+    			//System.out.println("fname_resized=["+fname_resized+"]");
     			ImageIO.write(imageContent, "jpg", new File(fname_resized));
     		} catch (IOException e) {
     			if (logger.isInfoEnabled())

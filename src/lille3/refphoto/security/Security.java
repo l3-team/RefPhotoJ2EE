@@ -5,7 +5,6 @@ import java.net.UnknownHostException;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.Context;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
@@ -40,7 +39,7 @@ public class Security {
     		logger.info(tab_address[i]);
     	}*/
     	
-    	String ip = this.getClientIp(request);
+    	String ip = this.getClientIp(request);    	    
     	    	
     	logger.info("ip checked:" + ip);
     	
@@ -124,7 +123,7 @@ public class Security {
             	remoteAddr = request.getHeader("x-forwarded-for");
             }
         } else {
-            remoteAddr = request.getRemoteAddr();
+            remoteAddr = request.getRemoteAddr();            
         }
         return remoteAddr;		
 	}

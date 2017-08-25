@@ -1,29 +1,23 @@
 package lille3.refphoto.service;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Hashtable;
-import java.util.Properties;
 import java.util.UUID;
+
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
-import lille3.refphoto.security.Security;
-import lille3.refphoto.utils.Sha1;
 import lille3.refphoto.binarystore.Binarystore;
-import lille3.refphoto.db.Dbconnectionmanager;
+import lille3.refphoto.db.Dbconnection;
 import lille3.refphoto.exception.NotFoundException;
 import lille3.refphoto.ldap.Ldapconnection;
 import lille3.refphoto.memcache.Memcache;
+import lille3.refphoto.security.Security;
+import lille3.refphoto.utils.Sha1;
 
 
 @Service
@@ -31,7 +25,8 @@ public class Photoserviceweb {
 	
     private static Logger logger = Logger.getLogger(Photoserviceweb.class.getName());
 	
-	private Dbconnectionmanager connMgr;
+	//private Dbconnectionmanager connMgr;
+	private Dbconnection db;
 	private Security secur;
 	private Memcache mc;
 	private Ldapconnection ldap;
@@ -41,7 +36,8 @@ public class Photoserviceweb {
 	
 	public Photoserviceweb(ServletContext context) {
 					
-		connMgr = ((Dbconnectionmanager) context.getAttribute("dbRefphoto"));
+		//connMgr = ((Dbconnectionmanager) context.getAttribute("dbRefphoto"));
+		db = ((Dbconnection) context.getAttribute("dbRefphoto2"));
 		secur = ((Security) context.getAttribute("securRefphoto"));
 		mc = ((Memcache) context.getAttribute("mcRefphoto"));
 		ldap = ((Ldapconnection) context.getAttribute("ldapRefphoto"));
@@ -82,18 +78,22 @@ public class Photoserviceweb {
 	
 	/*public void requete() {
 		
-		Connection con = connMgr.getConnection("refphoto");
-        if (con == null) {
+		//Connection con = connMgr.getConnection("refphoto");
+		this.db.connect();
+		
+        //if (con == null) {
+		if (!this.db.isConnected()) {
         	if (logger.isInfoEnabled())
     			logger.info("Can't get connection");
             return;
         }
         ResultSet rs = null;
         ResultSetMetaData md = null;
-        Statement stmt = null;
+        //Statement stmt = null;
         try {
-            stmt = con.createStatement();
-            rs = stmt.executeQuery("SELECT * FROM sha1");
+            //stmt = con.createStatement();
+            //rs = stmt.executeQuery("SELECT * FROM sha1");
+        	rs = this.db.query("SELECT * FROM sha1");
             md = rs.getMetaData();
             if (logger.isInfoEnabled())
     			logger.info("<H1>table sha1</H1>");
@@ -105,14 +105,15 @@ public class Photoserviceweb {
             			logger.info(rs.getString(i) + ", ");
                 }
             }
-            stmt.close();
+            //stmt.close();
             rs.close();
         }
         catch (SQLException e) {
         	if (logger.isInfoEnabled())
     			logger.info("erreur:"+e.getMessage());
         }
-        connMgr.freeConnection("refphoto", con);
+        //connMgr.freeConnection("refphoto", con);
+        this.db.disconnect();
 		
 	}*/
 	
@@ -191,19 +192,22 @@ public class Photoserviceweb {
 		
 		String query = "SELECT sha1 FROM sha1 WHERE uid = '" + uid + "'";
 		
-		Connection con = connMgr.getConnection("refphoto");
-        if (con == null) {
+		//Connection con = connMgr.getConnection("refphoto");
+		this.db.connect();
+        //if (con == null) {
+		if (!this.db.isConnected()) {
         	if (logger.isInfoEnabled())
     			logger.info("Can't get connection");
             return null;
         }
         ResultSet rs = null;
         //ResultSetMetaData md = null;
-        Statement stmt = null;
+        //Statement stmt = null;
         String valeur = "";
         try {
-            stmt = con.createStatement();
-            rs = stmt.executeQuery(query);
+            //stmt = con.createStatement();
+            //rs = stmt.executeQuery(query);
+        	rs = this.db.query(query);
             //md = rs.getMetaData();                        
             if (rs.next()) {
             	valeur = rs.getString(1);                           
@@ -212,13 +216,14 @@ public class Photoserviceweb {
             }
             sha1 = new Sha1("");
             sha1.setSha1(valeur);
-            stmt.close();
-            rs.close();
+            //stmt.close();
+            //rs.close();
         } catch (SQLException e) {
         	if (logger.isInfoEnabled())
     			logger.info("erreur:"+e.getMessage());
         }
-        connMgr.freeConnection("refphoto", con);
+        //connMgr.freeConnection("refphoto", con);
+        this.db.disconnect();
 		
         if (valeur.equals("")) return null;
         
@@ -228,9 +233,9 @@ public class Photoserviceweb {
 	}
 	
 	
-	public void importUserPhoto(String uid, boolean force) {
+/*public void importUserPhoto(String uid, boolean force) {
 		//String externalReference = "";
-		String id = "";
+		//String id = "";
 		
 		String query = "(&(objectclass=*)(" + this.ldap.getFieldid() + "=" + uid + "))";
 		String[] attributes = { this.ldap.getFieldid(), this.ldap.getFieldname(), this.ldap.getFieldprofil(), this.ldap.getFieldprofils(), this.ldap.getFieldiddstudent(), this.ldap.getFieldidemployee() };		
@@ -259,7 +264,7 @@ public class Photoserviceweb {
 				System.out.println("Erreur : impossible de récupérer le numéro individu pour l'uid " + uid);
 			}
 			//externalReference = "0" + datas_employee[0];
-			id = datas_employee[0];
+			//id = datas_employee[0];
 		} else if (student) {
 			String[] datas_student = results.get(this.ldap.getFieldiddstudent());
 			if (datas_student[0] == null) { 
@@ -267,11 +272,45 @@ public class Photoserviceweb {
 				System.out.println("Erreur : impossible de récupérer le numéro étudiant pour l'uid " + uid);
 			}
 			//externalReference = datas_student[0];
-			id = datas_student[0];
+			//id = datas_student[0];
 		} else {
 			return;
 		}
-	}
+	}*/
+	
+	/*public void importAllPhoto() {
+		String query = "(&(objectclass=*)(" + this.ldap.getFieldid() + "=*))";
+		
+		//String query = this.ldap.getFieldid() + "=1940";
+		
+		String[] attributes = { this.ldap.getFieldid() };		
+		this.ldap.Openconnection();
+		Hashtable<String, String[]> results[] = this.ldap.searchMultiple(query, attributes, "");
+		//Hashtable<String, String[]> results = this.ldap.search(query, attributes, "");
+		this.ldap.Closeconnection();
+		
+		
+		//if (results.isEmpty()) {
+		//	return;
+		//}
+		
+		//String[] uid = results.get(this.ldap.getFieldid());
+		
+		//System.out.println("uid=["+uid[0]+"]");
+		
+		String[] ids = null;
+		
+		if (results.length == 0) {
+			return;
+		}
+		for(int i=0; i<results.length;i++) {
+			ids = results[i].get(this.ldap.getFieldid());
+			for(int j=0; j<ids.length; j++) {
+				System.out.println("ids["+j+"]=["+ids[j]+"]");
+			}
+		}
+		
+	}*/
 	
 	public String getUidByCodEtu(String codeetu) {
 		String query = "(&(objectclass=*)("+this.ldap.getFieldiddstudent()+"="+codeetu+"))";
