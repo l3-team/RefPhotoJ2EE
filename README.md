@@ -43,6 +43,7 @@ Pre-requisites :
 * Memcached daemon
 * Directory datas with JPEG Photos (to rename like : {supannEmpId}.jpg (for an employee person) or {supannEtuId}.jpg (for a student person) ;
 * Directory binaries with write ACL unix for webserver (user tomcat8 or tomcat) ;
+* The user unix of the Tomcat (user tomcat8 or tomcat) needs to have write access on /tmp directory (chmod 777 /tmp)
 * List for ip address of dns host for the authorized applications ;
 * Optionnal : Ip address for the reverse proxy (for separated DMZ networks) ;
 
@@ -93,7 +94,7 @@ cd target/refphoto-0.0.1-SNAPSHOT/WEB-INF/classes
 export CLASSPATH=.:`pwd`/../lib/log4j-1.2.17.jar:`pwd`/../lib/spymemcached-2.12.3.jar:`pwd`/../lib/commons-lang-2.6.jar:`pwd`/../lib/mysql-connector-java-5.1.38.jar
 
 java lille3.refphoto.cli.Importuser <uid>
-(where uid is the uid of the person, example : java lille3.refphoto.cli.Importuser 1940)
+(where uid is the uid of the person, example : java lille3.refphoto.cli.Importuser P7279)
 ```
 - for loops on all LDAP user :
 ```
