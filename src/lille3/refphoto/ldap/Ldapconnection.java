@@ -42,6 +42,7 @@ public class Ldapconnection {
     private String field_positivevalue;
     private String field_negativevalue;
     private String field_id;
+    private String field_structureid;
     private String field_profil;
     private String field_profils;
     private String field_idstudent;
@@ -65,6 +66,7 @@ public class Ldapconnection {
         this.field_positivevalue = props.getProperty("ldap.field_positivevalue");
         this.field_negativevalue = props.getProperty("ldap.field_negativevalue");
         this.field_id = props.getProperty("ldap.field_id");
+        this.field_structureid = props.getProperty("ldap.field_structureid");
         this.field_profil = props.getProperty("ldap.field_profil");
         this.field_profils = props.getProperty("ldap.field_profils");
         this.field_idstudent = props.getProperty("ldap.field_idstudent");
@@ -292,6 +294,9 @@ public class Ldapconnection {
     
     public String getFieldid() {
     	return this.field_id;
+    }
+    public String getFieldstructureid() {
+    	return this.field_structureid;
     }
     
     public String getFieldprofil() {

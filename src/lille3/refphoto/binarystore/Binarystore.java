@@ -23,6 +23,7 @@ public class Binarystore {
 	private String photoread = null;
 	private String photodefault = null;
 	private String photoblocked = null;
+	private String photoforbidden = null;
 	private String photoresize = null;
 	private String photoextension = null;
 	
@@ -31,6 +32,7 @@ public class Binarystore {
 		this.photoread = props.getProperty("photo.read");
 		this.photodefault = props.getProperty("photo.default");
 		this.photoblocked = props.getProperty("photo.blocked");
+		this.photoforbidden = props.getProperty("photo.forbidden");
 		this.photoresize = props.getProperty("photo.resize");
 		this.photoextension = props.getProperty("photo.extension");		
 	}
@@ -256,6 +258,10 @@ public class Binarystore {
 	
 	public String getPathPhotoBlocked() {
 		return this.photoblocked;
+	}
+	
+	public String getPathPhotoForbidden() {
+		return this.photoforbidden;
 	}
 	
 	public String getPhotoPath() {

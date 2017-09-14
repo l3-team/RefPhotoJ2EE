@@ -70,7 +70,7 @@ public class Dbconnection {
 		try {
 		        
 			stmt = con.createStatement();
-			if (type_requete.equals("UPDATE") || (type_requete.equals("INSERT"))) {
+			if ( (type_requete.equals("UPDATE")) || (type_requete.equals("INSERT")) || (type_requete.equals("DELETE")) ) {
 				stmt.executeUpdate(query);
 				rs = null;
 			} else {		        

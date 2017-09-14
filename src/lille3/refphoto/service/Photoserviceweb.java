@@ -145,10 +145,12 @@ public class Photoserviceweb {
 	public String getPath(String token) {
 		//logger.info("token="+token);
 		String[] tab = this.mc.getTab("token_" + token);
-		if (tab == null) throw new NotFoundException();
+		//if (tab == null) throw new NotFoundException();
+		if (tab == null) return this.bs.getPathPhotoForbidden();
 		String uid = tab[0];
 		
-		if ((uid.equals("")) || (uid == null)) throw new NotFoundException();
+		//if ((uid.equals("")) || (uid == null)) throw new NotFoundException();
+		if ((uid.equals("")) || (uid == null)) return this.bs.getPathPhotoForbidden();
 		String bVerif = tab[1];
 		
 		this.mc.delete("token_" + token);

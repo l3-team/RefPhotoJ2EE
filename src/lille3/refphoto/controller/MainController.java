@@ -3,10 +3,15 @@ package lille3.refphoto.controller;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringWriter;
+import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -14,11 +19,15 @@ import javax.servlet.http.HttpServletResponse;
 
 //import org.apache.catalina.connector.Response;
 import org.apache.log4j.Logger;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import lille3.refphoto.exception.ForbiddenException;
@@ -79,6 +88,73 @@ public class MainController {
 	
 		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
 			return service.createToken(request, uid);
+		}
+		
+		throw new ForbiddenException();
+	}
+	
+	@RequestMapping(value = "/token/add", method = RequestMethod.POST)
+	@ResponseBody
+	public String createMultiTokensAction() {
+		
+		if (logger.isInfoEnabled())
+			logger.info("call action createMultiTokens(uid) from route /token/add");
+		
+		Photoserviceweb service = new Photoserviceweb(context);
+		
+		boolean verif_client_valid_server = service.checkValidServer(request);
+		
+		boolean verif_client_xvalid_server = service.checkXValidServer(request);
+	
+		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
+			
+			String body = "";
+			try {
+				body = getBody(request);
+			} catch(IOException e) {
+				if (logger.isInfoEnabled())
+					logger.info("erreur:"+e.getMessage());
+			}
+			
+			JSONParser parser = new JSONParser();
+			
+			JSONArray tokens = new JSONArray();
+			
+			
+			
+			try {
+				
+				Object obj = parser.parse(body);
+				JSONArray array = (JSONArray)obj;
+				
+				Iterator it = array.iterator();
+				
+				String tmp = "";
+				while(it.hasNext()) {
+					
+					String uid = (String) it.next();
+					
+					
+					tokens.add(service.createToken(request, uid));
+					
+				}
+				
+			} catch(ParseException e) {
+				if (logger.isInfoEnabled())
+					logger.info("erreur:"+e.getMessage());
+			}
+			
+			StringWriter out = new StringWriter();
+			
+			try {
+				tokens.writeJSONString(out);
+			} catch (IOException e) {
+				if (logger.isInfoEnabled())
+					logger.info("erreur:"+e.getMessage());
+			}
+			
+			return out.toString();
+			
 		}
 		
 		throw new ForbiddenException();
@@ -340,5 +416,39 @@ public class MainController {
         }
     }
  
+
+	public static String getBody(HttpServletRequest request) throws IOException {
+
+	    String body = null;
+	    StringBuilder stringBuilder = new StringBuilder();
+	    BufferedReader bufferedReader = null;
+
+	    try {
+	        InputStream inputStream = request.getInputStream();
+	        if (inputStream != null) {
+	            bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+	            char[] charBuffer = new char[128];
+	            int bytesRead = -1;
+	            while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
+	                stringBuilder.append(charBuffer, 0, bytesRead);
+	            }
+	        } else {
+	            stringBuilder.append("");
+	        }
+	    } catch (IOException ex) {
+	        throw ex;
+	    } finally {
+	        if (bufferedReader != null) {
+	            try {
+	                bufferedReader.close();
+	            } catch (IOException ex) {
+	                throw ex;
+	            }
+	        }
+	    }
+
+	    body = stringBuilder.toString();
+	    return body;
+	}
 	
 }

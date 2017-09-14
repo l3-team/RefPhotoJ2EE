@@ -10,6 +10,7 @@ ldap.field_name = udlListeServices
 ldap.field_positivevalue = usePhotoTrue
 ldap.field_negativevalue = usePhotoFalse
 ldap.field_id = uid
+ldap.field_structureid = supannCodeEntite
 ldap.field_profil = eduPersonPrimaryAffiliation
 ldap.field_profils = eduPersonAffiliation
 ldap.field_idstudent = supannEtuId

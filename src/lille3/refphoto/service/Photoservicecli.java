@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Properties;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -289,6 +291,100 @@ public class Photoservicecli {
 			System.out.println("Pas de photo pour l'uid "+ uid + " (de type "+ profil[0]+")");
 		}
 		
+		
+	}
+	
+	public void delete() {
+		String query = "(&(objectclass=*)(" + this.ldap.getFieldid() + "=*))";
+		
+		String[] attributes = { this.ldap.getFieldid() };		
+		this.ldap.Openconnection();
+		Hashtable<String, String[]> results[] = this.ldap.searchMultiple(query, attributes, "");
+		this.ldap.Closeconnection();
+
+		LinkedList<String> uidList = new LinkedList<String>();
+		
+		if (results.length == 0) {
+			return;
+		}
+		
+		String[] ids = null;
+		
+		for(int i=0; i<results.length;i++) {
+			ids = results[i].get(this.ldap.getFieldid());
+			//for(int j=0; j<ids.length; j++) {
+				//System.out.println("ids[0]=["+ids[0]+"]");
+				uidList.add(ids[0]);
+			//}
+		}
+		
+		String query2 = "(&(objectclass=*)(" + this.ldap.getFieldstructureid() + "=*))";
+		
+		String[] attributes2 = { this.ldap.getFieldstructureid() };		
+		this.ldap.Openconnection();
+		Hashtable<String, String[]> results2[] = this.ldap.searchMultiple(query2, attributes2, "ou=structures");
+		this.ldap.Closeconnection();
+		
+		String[] structureids = null;
+		
+		for(int i=0; i<results2.length;i++) {
+			structureids = results2[i].get(this.ldap.getFieldstructureid());
+			//for(int j=0; j<ids.length; j++) {
+				//System.out.println("ids[0]=["+ids[0]+"]");
+				uidList.add(structureids[0]);
+			//}
+		}
+		
+		/*
+		Iterator it=uidList.iterator();
+		String tmp="";
+		while(it.hasNext()) {
+			tmp=(String)it.next();
+			System.out.println(tmp);
+		}
+		*/
+		
+		String query3 = "SELECT uid, sha1 FROM sha1";
+		this.db.connect();
+		if (!this.db.isConnected()) {
+        	System.out.println("Can't get connection");
+            return;
+        }		
+        ResultSet rs = null;
+        @SuppressWarnings("unused")
+		ResultSet rs2 = null;
+        String uid="";
+        String sha1="";
+        try {
+        	rs = this.db.query(query3);
+        	while(rs.next()) {        	           
+            	uid = rs.getString(1);
+            	sha1 = rs.getString(2);
+            	
+            	System.out.println("-----------------------------");
+            	System.out.println("uid = [" + uid + "]");
+            	System.out.println("sha1 = [" + sha1 + "]");
+            	
+            	if (uidList.contains(uid)) {
+            		System.out.println("uid trouvé dans le LDAP = [OUI]");
+            		System.out.println("photo conservée");
+            	} else {
+            		System.out.println("uid trouvé dans le LDAP = [NON]");
+            		Sha1 s=new Sha1("");
+            		s.setSha1(sha1);
+            		if (this.bs.deleteFile(s)) {
+            			System.out.println("photo supprimée");
+            			String query4 = "DELETE FROM sha1 WHERE uid="+uid;
+                        rs2 = this.db.query(query4);
+                    }
+            	}
+            	
+            }
+        }
+        catch (SQLException e) {
+        	System.out.println("erreur:"+e.getMessage());
+        }
+        this.db.disconnect();
 		
 	}
 	
