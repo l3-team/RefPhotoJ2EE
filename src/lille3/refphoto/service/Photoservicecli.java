@@ -247,7 +247,7 @@ public class Photoservicecli {
 		
 		
 		if (img != null) {
-			Sha1[] sha1s = this.bs.saveImage(img);
+			Sha1[] sha1s = this.bs.saveImage(img, true);
 			Sha1 oldOriginSha1 = this.getOriginSha1ForUid(uid);
 			if (oldOriginSha1 != null) {
 				if (!oldOriginSha1.equals(sha1s[1])) {

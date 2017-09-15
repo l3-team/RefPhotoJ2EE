@@ -115,5 +115,28 @@ java lille3.refphoto.cli.Delete
 (for import all photos for all person in the ldap)
 ```
 
+Usecase for upload
+---
+It is possible to upload a picture directly in the referencial photo/
+For this it should just use a formulary HTML with method POST to the route /upload/{uid}.
+And next modify just the field uid, login and password in the example bellow
+Example for upload with uid "toto" :
+```
 
+<form method="post" action="http://serveur/refphoto/web/upload/toto" enctype="multipart/form-data">
+
+	<label for="icone">Fichier :</label><br />
+
+        <input type="file" name="file" id="file" /><br />
+
+	<input type="hidden" name="login" value="identifiant à remplacer"/>
+
+	<input type="hidden" name="password" value="mot de passe à remplacer"/>
+
+        <input type="hidden" name="MAX_FILE_SIZE" value="1048576" />
+
+        <input type="submit" name="submit" value="Envoyer" />
+
+</form>
+```
 

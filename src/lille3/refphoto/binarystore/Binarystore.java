@@ -26,6 +26,8 @@ public class Binarystore {
 	private String photoforbidden = null;
 	private String photoresize = null;
 	private String photoextension = null;
+	private String photologin = null;
+	private String photopassword = null;
 	
 	public Binarystore(Properties props) {
 		this.photopath = props.getProperty("photo.path");
@@ -34,7 +36,9 @@ public class Binarystore {
 		this.photoblocked = props.getProperty("photo.blocked");
 		this.photoforbidden = props.getProperty("photo.forbidden");
 		this.photoresize = props.getProperty("photo.resize");
-		this.photoextension = props.getProperty("photo.extension");		
+		this.photoextension = props.getProperty("photo.extension");
+		this.photologin = props.getProperty("photo.login");
+		this.photopassword = props.getProperty("photo.password");
 	}
 	
 	public String[] buildPathWithSha1(Sha1 sha1) {
@@ -95,7 +99,7 @@ public class Binarystore {
 		return image;
 	}
 	
-	public Sha1[] saveImage(File image) {
+	public Sha1[] saveImage(File image, boolean resize) {
 	//public Sha1[] saveImage(BufferedImage imageContent) {
 		/*ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
@@ -159,7 +163,7 @@ public class Binarystore {
 		//ff.delete();
 		
 		
-        if (!this.photoresize.equals("")) {        	        
+        if ( (!this.photoresize.equals("")) && (resize == true) ) {        	        
         	int type = imageContent.getType() == 0? BufferedImage.TYPE_INT_ARGB : imageContent.getType();
         	String[] values = this.photoresize.split("x");
         	int height = Integer.parseInt(values[1]);
@@ -278,5 +282,13 @@ public class Binarystore {
 	
 	public String getPhotoExtension() {
 		return this.photoextension;
+	}
+	
+	public String getPhotoLogin() {
+		return this.photologin;		
+	}
+	
+	public String getPhotoPassword() {
+		return this.photopassword;
 	}
 }

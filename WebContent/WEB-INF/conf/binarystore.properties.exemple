@@ -4,3 +4,5 @@ photo.default = /home/mhetru/workspace/refphoto/default.jpg
 photo.blocked = /home/mhetru/workspace/refphoto/blocked.jpg
 photo.resize = 161x178
 photo.extension = .jpg
+photo.login = wsrefphotoupload
+photo.password = wsrefphotopassword

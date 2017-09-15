@@ -1,12 +1,20 @@
 package lille3.refphoto.service;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.UUID;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.Part;
 
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -33,7 +41,6 @@ public class Photoserviceweb {
 	private Binarystore bs;
 	
 	
-	
 	public Photoserviceweb(ServletContext context) {
 					
 		//connMgr = ((Dbconnectionmanager) context.getAttribute("dbRefphoto"));
@@ -41,11 +48,19 @@ public class Photoserviceweb {
 		secur = ((Security) context.getAttribute("securRefphoto"));
 		mc = ((Memcache) context.getAttribute("mcRefphoto"));
 		ldap = ((Ldapconnection) context.getAttribute("ldapRefphoto"));
-		bs = ((Binarystore) context.getAttribute("bsRefphoto"));
-			
+		bs = ((Binarystore) context.getAttribute("bsRefphoto"));		
+		
 		if (logger.isInfoEnabled())
 			logger.info("init photoservice");
 		
+	}
+	
+	public boolean authenticate(String login, String password) {
+		if ( (this.bs.getPhotoLogin().equals(login)) && (this.bs.getPhotoPassword().equals(password)) ) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 	
 	public boolean checkValidServer(HttpServletRequest request) {
@@ -185,6 +200,31 @@ public class Photoserviceweb {
 		}
 		return this.bs.getPathPhotoBlocked();
 		
+	}
+	
+	public String getPathWithoutVerif(String token) {
+		//logger.info("token="+token);
+		String[] tab = this.mc.getTab("token_" + token);
+		//if (tab == null) throw new NotFoundException();
+		if (tab == null) return this.bs.getPathPhotoForbidden();
+		String uid = tab[0];
+		
+		//if ((uid.equals("")) || (uid == null)) throw new NotFoundException();
+		if ((uid.equals("")) || (uid == null)) return this.bs.getPathPhotoForbidden();
+		
+		
+		this.mc.delete("token_" + token);
+		
+		Sha1 sha1 = this.getSha1ForUid(uid);
+		
+		if (sha1 != null) {
+			
+			String[] buildpathwithsha1 = this.bs.buildPathWithSha1(sha1);
+			return this.bs.getPhotoPath() + "/" + buildpathwithsha1[0] + "/" + buildpathwithsha1[1];
+				
+		}
+		
+		return "";		
 	}
 	
 	public Sha1 getSha1ForUid(String uid) {
@@ -344,6 +384,155 @@ public class Photoserviceweb {
 			return uid[0];
 		}
 		//return "P";
+	}
+	
+	public String uploadPhoto(HttpServletRequest request, String uid) {
+		
+		InputStream filecontent = null;
+		OutputStream out = null;
+		
+		String query = "";
+		String text = "";
+		String login = request.getParameter("login");
+		String password = request.getParameter("password");
+		boolean authenticate = this.authenticate(login, password);
+		
+		
+		if (authenticate) {
+			String uniqid = UUID.randomUUID().toString();
+			
+			try {
+				Part filePart = request.getPart("file");
+				
+				out = new FileOutputStream(new File("/tmp/" + uniqid));
+				
+				filecontent = filePart.getInputStream();
+
+		        int read = 0;
+		        final byte[] bytes = new byte[1024];
+
+		        while ((read = filecontent.read(bytes)) != -1) {
+		            out.write(bytes, 0, read);
+		        }
+		    
+			} catch (FileNotFoundException e) {
+				if (logger.isInfoEnabled())
+	    			logger.info("erreur:"+e.getMessage());
+			} catch (IOException e) {
+				if (logger.isInfoEnabled())
+	    			logger.info("erreur:"+e.getMessage());
+			} catch (ServletException e) {
+				if (logger.isInfoEnabled())
+	    			logger.info("erreur:"+e.getMessage());
+			} finally {
+		        if (out != null) {
+		            try {
+						out.close();
+					} catch (IOException e) {
+						if (logger.isInfoEnabled())
+			    			logger.info("erreur:"+e.getMessage());
+					}
+		        }
+		        if (filecontent != null) {
+		            try {
+						filecontent.close();
+					} catch (IOException e) {
+						if (logger.isInfoEnabled())
+			    			logger.info("erreur:"+e.getMessage());
+					}
+		        }
+		    }
+			
+			File img = new File("/tmp/"+uniqid);
+			
+			Sha1[] sha1s = this.bs.saveImage(img, false);
+			
+			Sha1 oldOriginSha1 = this.getOriginSha1ForUid(uid);
+			
+			if (oldOriginSha1 != null) {
+				if (!oldOriginSha1.equals(sha1s[1])) {
+					this.bs.deleteFile(this.getSha1ForUid(uid));
+				} else {
+					text = "Photo déjà existante";
+					return text;
+				}
+				query = "UPDATE sha1 SET sha1='" + sha1s[0].getSha1() + "', originsha1='"+sha1s[1].getSha1()+"' WHERE uid = '" + uid + "'";
+				text = "Photo mise à jour";
+			} else {
+				query = "INSERT INTO sha1(uid, sha1, originsha1) VALUE ('"+uid+"', '"+sha1s[0].getSha1()+"', '"+sha1s[1].getSha1()+"')";	
+				text = "Photo enregistrée";
+			}
+			
+			//Connection con = connMgr.getConnection("refphoto");
+			this.db.connect();
+	        //if (con == null) {
+			if (!this.db.isConnected()) {
+	        	System.out.println("Can't get connection");
+	            return "";
+	        }
+	        //ResultSet rs = null;
+	        //ResultSetMetaData md = null;
+	        //Statement stmt = null;
+	        //try {
+	            //stmt = con.createStatement();
+	            //stmt.executeUpdate(query);
+	        	this.db.query(query);
+	            //rs = null;
+	            //stmt.close();
+	        /*}
+	        catch (SQLException e) {
+	        	System.out.println("erreur:"+e.getMessage());
+	        }*/
+	        //connMgr.freeConnection("refphoto", con);
+	        this.db.disconnect();
+			
+			this.mc.delete("sha1_"+uid);
+			
+		} else {
+			text = "La photo n'a pas pu être mise à jour : accès refusé";
+		}
+		
+		return text;
+	}
+	
+	public Sha1 getOriginSha1ForUid(String uid) {
+		Sha1 retour = null;
+		String valeur = "";
+		String query = " SELECT originsha1 FROM sha1 WHERE uid = '" + uid + "' ";
+		
+		//Connection con = connMgr.getConnection("refphoto");
+		this.db.connect();
+        //if (con == null) {
+		if (!this.db.isConnected()) {
+        	System.out.println("Can't get connection");
+            return null;
+        }
+        ResultSet rs = null;
+        //ResultSetMetaData md = null;
+        //Statement stmt = null;        
+        try {
+            //stmt = con.createStatement();
+            //rs = stmt.executeQuery(query);
+        	rs = this.db.query(query);        	
+            //md = rs.getMetaData();
+            if (rs.next()) {
+            	valeur = rs.getString(1);
+            	retour = new Sha1("");
+                retour.setSha1(valeur);
+            } else {
+            	//this.db.disconnect();
+            	retour = null;
+            }
+            //stmt.close();
+            //rs.close();
+        }
+        catch (SQLException e) {
+        	System.out.println("erreur:"+e.getMessage());
+        	retour = null;
+        }
+        //connMgr.freeConnection("refphoto", con);
+        this.db.disconnect();
+		return retour;
 	}
 	
 	public void closeMc() {

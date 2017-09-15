@@ -405,6 +405,72 @@ public class MainController {
 		
 	}
 	
+	/*
+	@RequestMapping(value = "/authenticate", method = RequestMethod.POST)
+	public void authenticateAction() {
+		
+	}
+	*/
+	
+	@RequestMapping(value = "/upload/{uid}", method = RequestMethod.POST)
+	@ResponseBody
+	public String uploadAction(@PathVariable("uid") String uid) {
+		
+		if (logger.isInfoEnabled())
+			logger.info("call action uploadAction(uid) from route /upload");
+		
+		Photoserviceweb service = new Photoserviceweb(context);
+		
+		return service.uploadPhoto(request, uid);
+	}
+	
+	@RequestMapping(value = "/download/{token}")
+	public void downloadAction(@PathVariable("token") String token) {
+		
+		if (logger.isInfoEnabled())
+			logger.info("call action downloadAction(token) from route /download");
+		
+		
+		Photoserviceweb service = new Photoserviceweb(context);
+		
+		String imageUrl = service.getPathWithoutVerif(token);		
+		
+		response.reset();
+		response.setBufferSize(DEFAULT_BUFFER_SIZE);
+		response.setContentType("image/jpeg");
+		
+		BufferedInputStream input = null;
+        BufferedOutputStream output = null;
+		
+		try {			
+			input = new BufferedInputStream(new FileInputStream(imageUrl), DEFAULT_BUFFER_SIZE);
+		    output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
+					    
+            byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+            int length;
+            while ((length = input.read(buffer)) > -1) {
+                output.write(buffer, 0, length);
+            }
+            output.flush();
+		    
+            if (logger.isInfoEnabled())
+    			logger.info("fichier renvoyé: " + imageUrl); 
+            
+		} catch (FileNotFoundException e) {
+			if (logger.isInfoEnabled())
+				logger.info("erreur:"+e.getMessage());
+		} catch (IOException e) {
+			if (logger.isInfoEnabled())
+				logger.info("erreur:"+e.getMessage());
+		} finally {            
+            close(output);
+            close(input);
+        }
+		
+		
+		
+	}
+	
 	private static void close(Closeable resource) {
         if (resource != null) {
             try {
