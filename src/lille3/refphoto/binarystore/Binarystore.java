@@ -80,8 +80,8 @@ public class Binarystore {
 		if (image.exists()) {
 			return_val = 0;
 		} else {
-			image = new File(this.photodefault);
-			//image = null;
+			//image = new File(this.photodefault);
+			image = null;
 			return_val = 1;
 		}
 		
@@ -93,7 +93,7 @@ public class Binarystore {
 		if (return_val == 0) {
 			return image;
 		} else {
-			System.out.println("Erreur : Fichier " + this.photoread + "/" + id + this.photoextension + " introuvable pour l'uid " + uid + " (de type " + type + "). Utilisation du fichier " + this.photodefault);
+			System.out.println("Erreur : Fichier " + this.photoread + "/" + id + this.photoextension + " introuvable pour l'uid " + uid + " (de type " + type + ").);
 		}
 		
 		return image;

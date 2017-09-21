@@ -120,9 +120,9 @@ public class Photoservicecli {
 	}*/
 	
 	public Sha1 getSha1ForUid(String uid) {
-		Sha1 sha1 = this.mc.getSha1("sha1_" + uid);
+		//Sha1 sha1 = this.mc.getSha1("sha1_" + uid);
 		
-		if (sha1 != null) return sha1;
+		//if (sha1 != null) return sha1;
 		
 		String query = "SELECT sha1 FROM sha1 WHERE uid = '" + uid + "'";
 		
@@ -157,7 +157,7 @@ public class Photoservicecli {
 		
         if (valeur.equals("")) return null;
         
-        this.mc.setSha1("sha1_" + uid, 0, new Sha1(valeur));
+        //this.mc.setSha1("sha1_" + uid, 0, new Sha1(valeur));
         
 		return new Sha1(valeur);
 	}
