@@ -87,7 +87,27 @@ public class MainController {
 		boolean verif_client_xvalid_server = service.checkXValidServer(request);
 	
 		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
-			return service.createToken(request, uid);
+			return service.createToken(request, uid, null);
+		}
+		
+		throw new ForbiddenException();
+	}
+	
+	@RequestMapping(value = "/token/{codeapp}/{uid}")
+	@ResponseBody
+	public String createTokenActionWithCode(@PathVariable("codeapp") String codeapp, @PathVariable("uid") String uid) {
+		
+		if (logger.isInfoEnabled())
+			logger.info("call action createTokenActionWithCode(uid) from route /token");
+		
+		Photoserviceweb service = new Photoserviceweb(context);
+		
+		boolean verif_client_valid_server = service.checkValidServer(request);
+		
+		boolean verif_client_xvalid_server = service.checkXValidServer(request);
+	
+		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
+			return service.createToken(request, uid, codeapp);
 		}
 		
 		throw new ForbiddenException();
@@ -135,7 +155,7 @@ public class MainController {
 					String uid = (String) it.next();
 					
 					
-					tokens.add(service.createToken(request, uid));
+					tokens.add(service.createToken(request, uid, null));
 					
 				}
 				
@@ -173,7 +193,7 @@ public class MainController {
 		boolean verif_client_xvalid_server = service.checkXValidServer(request);
 
 		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
-			String imageUrl = service.getPath(service.createToken(request, uid));		
+			String imageUrl = service.getPath(service.createToken(request, uid, null));		
 		
 			response.reset();
 			response.setBufferSize(DEFAULT_BUFFER_SIZE);
@@ -226,7 +246,7 @@ public class MainController {
 		boolean verif_client_xvalid_server = service.checkXValidServer(request);
 	
 		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
-			return service.createToken(request, service.getUidByCodEtu(codeetu));
+			return service.createToken(request, service.getUidByCodEtu(codeetu), null);
 		}
 		
 		throw new ForbiddenException();
@@ -246,7 +266,7 @@ public class MainController {
 
 		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
 			String uid = service.getUidByCodEtu(codeetu);
-			String imageUrl = service.getPath(service.createToken(request, uid));		
+			String imageUrl = service.getPath(service.createToken(request, uid, null));		
 		
 			response.reset();
 			response.setBufferSize(DEFAULT_BUFFER_SIZE);
@@ -299,7 +319,7 @@ public class MainController {
 		boolean verif_client_xvalid_server = service.checkXValidServer(request);
 	
 		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
-			return service.createToken(request, service.getUidByCodPers(codepers));
+			return service.createToken(request, service.getUidByCodPers(codepers), null);
 		}
 		
 		throw new ForbiddenException();
@@ -319,7 +339,7 @@ public class MainController {
 
 		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
 			String uid = service.getUidByCodPers(codepers);
-			String imageUrl = service.getPath(service.createToken(request, uid));		
+			String imageUrl = service.getPath(service.createToken(request, uid, null));		
 		
 			response.reset();
 			response.setBufferSize(DEFAULT_BUFFER_SIZE);

@@ -80,7 +80,7 @@ public class Photoserviceweb {
 	public boolean checkXValidServer(HttpServletRequest request) {
 		
 		
-		boolean authorized = secur.checkAddressXValidServer(request);
+		boolean authorized = secur.checkAddressXValidServer(request);	
 		
 		if (authorized) {
 			logger.info("this client is Xauthorized");
@@ -132,12 +132,13 @@ public class Photoserviceweb {
 		
 	}*/
 	
-	public String createToken(HttpServletRequest request, String uid) {
+	public String createToken(HttpServletRequest request, String uid, String codeapp) {
 		boolean verif_client_xvalid_server = secur.checkAddressXValidServer(request);
+		boolean verif_client_xvalid_code = secur.checkXValidCodeapp(codeapp);
 		String token = "";
 		String bVerif = "1";
 		
-		if (verif_client_xvalid_server) {
+		if ( (verif_client_xvalid_server) && (verif_client_xvalid_code) ) {
 			bVerif = "0";
 		} else {
 			bVerif = "1";

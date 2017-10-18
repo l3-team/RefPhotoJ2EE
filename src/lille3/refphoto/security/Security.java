@@ -20,6 +20,7 @@ public class Security {
     private String reverseproxy;
     private String valid_server;
     private String xvalid_server;
+    private String xvalid_codeapp;
     
     
     
@@ -28,6 +29,7 @@ public class Security {
     	this.reverseproxy = props.getProperty("security.reverseproxy");
     	this.valid_server = props.getProperty("security.valid_server");
     	this.xvalid_server = props.getProperty("security.xvalid_server");    	
+    	this.xvalid_codeapp = props.getProperty("security.xvalid_codeapp");
     }
 	
     public boolean checkAddressValidServer(HttpServletRequest request) {
@@ -114,6 +116,30 @@ public class Security {
     	return check;
     }
     
+    public boolean checkXValidCodeapp(String code) {
+    	boolean check = false;
+
+    	String[] tab_code = this.xvalid_codeapp.split(",");    	
+    	    	    	
+    	logger.info("code checked:" + code);
+    	
+    	boolean verif_code = ArrayUtils.contains(tab_code, code);
+    	
+    	if (verif_code) {
+    		logger.info("authorized");
+    	} else {
+    		logger.info("not authorized");
+    	}
+    	
+    	if (verif_code) {
+    		check = true;
+    	} else {
+    		check = false;
+    	}
+    	    	
+    	return check;
+    }
+    
 	private String getClientIp(HttpServletRequest request) {
 		String remoteAddr = "";
 		if (this.active_reverse_proxy.equals("true")) {
@@ -139,5 +165,6 @@ public class Security {
 				logger.info("erreur:"+e.getMessage());
 		}
 		return host;
-	}	
+	}
+	
 }

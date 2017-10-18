@@ -93,7 +93,7 @@ public class Binarystore {
 		if (return_val == 0) {
 			return image;
 		} else {
-			System.out.println("Erreur : Fichier " + this.photoread + "/" + id + this.photoextension + " introuvable pour l'uid " + uid + " (de type " + type + ").);
+			System.out.println("Erreur : Fichier " + this.photoread + "/" + id + this.photoextension + " introuvable pour l'uid " + uid + " (de type " + type + ")");
 		}
 		
 		return image;
