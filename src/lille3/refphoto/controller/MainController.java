@@ -232,6 +232,58 @@ public class MainController {
 		throw new ForbiddenException();
 	}
 	
+	@RequestMapping(value = "/binaryDownload/{uid}")
+	public void binaryDownloadAction(@PathVariable("uid") String uid) {
+		
+		if (logger.isInfoEnabled())
+			logger.info("call action binaryAction(uid) from route /binary");
+		
+		Photoserviceweb service = new Photoserviceweb(context);
+		
+		boolean verif_client_valid_server = service.checkValidServer(request);
+		
+		boolean verif_client_xvalid_server = service.checkXValidServer(request);
+
+		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
+			String imageUrl = service.getPathWithoutVerif(service.createToken(request, uid, null));		
+		
+			response.reset();
+			response.setBufferSize(DEFAULT_BUFFER_SIZE);
+			response.setContentType("image/jpeg");
+			
+			BufferedInputStream input = null;
+	        BufferedOutputStream output = null;
+			
+			try {			
+				input = new BufferedInputStream(new FileInputStream(imageUrl), DEFAULT_BUFFER_SIZE);
+			    output = new BufferedOutputStream(response.getOutputStream(), DEFAULT_BUFFER_SIZE);
+						    
+	            byte[] buffer = new byte[DEFAULT_BUFFER_SIZE];
+	            int length;
+	            while ((length = input.read(buffer)) > -1) {
+	                output.write(buffer, 0, length);
+	            }
+	            output.flush();
+			    
+	            if (logger.isInfoEnabled())
+	    			logger.info("fichier renvoyé: " + imageUrl); 
+	            
+			} catch (FileNotFoundException e) {
+				if (logger.isInfoEnabled())
+					logger.info("erreur:"+e.getMessage());
+			} catch (IOException e) {
+				if (logger.isInfoEnabled())
+					logger.info("erreur:"+e.getMessage());
+			} finally {            
+	            close(output);
+	            close(input);
+	        }
+			return;
+		}
+		
+		throw new ForbiddenException();
+	}
+	
 	@RequestMapping(value = "/tokenEtu/add/{codeetu}")
 	@ResponseBody
 	public String createTokenEtuAction(@PathVariable("codeetu") String codeetu) {
@@ -388,7 +440,7 @@ public class MainController {
 		Photoserviceweb service = new Photoserviceweb(context);
 		
 		String imageUrl = service.getPath(token);		
-		
+		//logger.info("imageUrl="+imageUrl);
 		response.reset();
 		response.setBufferSize(DEFAULT_BUFFER_SIZE);
 		response.setContentType("image/jpeg");
@@ -491,6 +543,8 @@ public class MainController {
 		
 	}
 	
+	
+	
 	private static void close(Closeable resource) {
         if (resource != null) {
             try {
@@ -502,6 +556,7 @@ public class MainController {
         }
     }
  
+	
 
 	public static String getBody(HttpServletRequest request) throws IOException {
 

@@ -16,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.Part;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
@@ -144,6 +145,8 @@ public class Photoserviceweb {
 			bVerif = "1";
 		}
 		
+		//logger.info("bVerif="+bVerif);
+		
 		do {
 			Sha1 s = new Sha1(uid + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID().toString().substring(13).toLowerCase());
 			token = s.getSha1().substring(0, 15);
@@ -161,14 +164,15 @@ public class Photoserviceweb {
 	public String getPath(String token) {
 		//logger.info("token="+token);
 		String[] tab = this.mc.getTab("token_" + token);
+		//logger.info("tab="+tab);
 		//if (tab == null) throw new NotFoundException();
 		if (tab == null) return this.bs.getPathPhotoForbidden();
 		String uid = tab[0];
-		
+		//logger.info("uid="+uid);
 		//if ((uid.equals("")) || (uid == null)) throw new NotFoundException();
 		if ((uid.equals("")) || (uid == null)) return this.bs.getPathPhotoForbidden();
 		String bVerif = tab[1];
-		
+		//logger.info("bVerif="+bVerif);
 		this.mc.delete("token_" + token);
 		
 		Sha1 sha1 = this.getSha1ForUid(uid);
@@ -187,10 +191,12 @@ public class Photoserviceweb {
 				if (udllisteservices == null) {
 					return this.bs.getPathPhotoDefault();
 				}
-				if (udllisteservices[0].equals(this.ldap.getFieldnegativevalue())) {
+				//if (udllisteservices[0].equals(this.ldap.getFieldnegativevalue())) {
+				if (ArrayUtils.contains(udllisteservices, this.ldap.getFieldnegativevalue())) {
 					return this.bs.getPathPhotoBlocked();
 				}
-				if (udllisteservices[0].equals(this.ldap.getFieldpositivevalue())) {
+				//if (udllisteservices[0].equals(this.ldap.getFieldpositivevalue())) {
+				if (ArrayUtils.contains(udllisteservices, this.ldap.getFieldpositivevalue())) {
 					String[] buildpathwithsha1 = this.bs.buildPathWithSha1(sha1);
 					return this.bs.getPhotoPath() + "/" + buildpathwithsha1[0] + "/" + buildpathwithsha1[1];
 				}
