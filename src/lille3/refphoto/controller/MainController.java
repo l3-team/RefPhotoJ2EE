@@ -118,7 +118,7 @@ public class MainController {
 	public String createMultiTokensAction() {
 		
 		if (logger.isInfoEnabled())
-			logger.info("call action createMultiTokens(uid) from route /token/add");
+			logger.info("call action createMultiTokens() from route /token/add");
 		
 		Photoserviceweb service = new Photoserviceweb(context);
 		
@@ -156,6 +156,73 @@ public class MainController {
 					
 					
 					tokens.add(service.createToken(request, uid, null));
+					
+				}
+				
+			} catch(ParseException e) {
+				if (logger.isInfoEnabled())
+					logger.info("erreur:"+e.getMessage());
+			}
+			
+			StringWriter out = new StringWriter();
+			
+			try {
+				tokens.writeJSONString(out);
+			} catch (IOException e) {
+				if (logger.isInfoEnabled())
+					logger.info("erreur:"+e.getMessage());
+			}
+			
+			return out.toString();
+			
+		}
+		
+		throw new ForbiddenException();
+	}
+	
+	@RequestMapping(value = "/token/{codeapp}", method = RequestMethod.POST)
+	@ResponseBody
+	public String createMultiTokensWithCodeAction(@PathVariable("codeapp") String codeapp) {
+		
+		if (logger.isInfoEnabled())
+			logger.info("call action createMultiTokensWithCode(codeapp) from route /token");
+		
+		Photoserviceweb service = new Photoserviceweb(context);
+		
+		boolean verif_client_valid_server = service.checkValidServer(request);
+		
+		boolean verif_client_xvalid_server = service.checkXValidServer(request);
+	
+		if ((verif_client_valid_server) || (verif_client_xvalid_server)) {
+			
+			String body = "";
+			try {
+				body = getBody(request);
+			} catch(IOException e) {
+				if (logger.isInfoEnabled())
+					logger.info("erreur:"+e.getMessage());
+			}
+			
+			JSONParser parser = new JSONParser();
+			
+			JSONArray tokens = new JSONArray();
+			
+			
+			
+			try {
+				
+				Object obj = parser.parse(body);
+				JSONArray array = (JSONArray)obj;
+				
+				Iterator it = array.iterator();
+				
+				String tmp = "";
+				while(it.hasNext()) {
+					
+					String uid = (String) it.next();
+					
+					
+					tokens.add(service.createToken(request, uid, codeapp));
 					
 				}
 				
